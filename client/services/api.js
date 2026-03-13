@@ -1,6 +1,6 @@
 import axios from "axios";
-require('dotenv').config();
-const URL = process.env.URL;
+
+const URL = import.meta.env.VITE_API_URL; // ✅ correct way in Vite
 
 export const api = axios.create({
     baseURL: URL, 
