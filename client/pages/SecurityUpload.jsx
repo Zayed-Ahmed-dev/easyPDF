@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaCloudUploadAlt } from "react-icons/fa";
+import {api} from "../services/api"
 
 export default function SecurityUpload() {
   const { type } = useParams(); // encrypt or decrypt
@@ -24,7 +25,7 @@ export default function SecurityUpload() {
       formData.append("password", password);
 
       const response = await fetch(
-        `http://localhost:8000/api/file/${type}`,
+        `${api}/api/file/${type}`,
         {
           method: "POST",
           body: formData,
