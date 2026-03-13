@@ -43,6 +43,34 @@ app.get('/', (req, res) => {
   res.send('Server is running');
 });
 
+//test route
+// Assuming you have your Express app defined as 'app'
+const { execFile } = require("child_process");
+
+// Temporary test endpoint
+app.get("/test-pdf2docx", (req, res) => {
+  execFile(
+    "python3",
+    ["-c", "import pdf2docx; print('pdf2docx works')"],
+    (err, stdout, stderr) => {
+      if (err) {
+        console.error("Error:", err);
+        return res.status(500).send({
+          success: false,
+          message: "Python or pdf2docx not working",
+          error: stderr || err.message,
+        });
+      }
+
+      console.log("PDF2DOCX test stdout:", stdout);
+      res.send({
+        success: true,
+        message: stdout.trim(),
+      });
+    }
+  );
+});
+
 // Start server
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
