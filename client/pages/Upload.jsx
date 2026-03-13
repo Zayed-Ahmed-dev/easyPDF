@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaCloudUploadAlt, FaFileAlt } from "react-icons/fa";
+import { api } from "../services/api";
 
 export default function Upload({
   title,
@@ -27,58 +28,50 @@ export default function Upload({
       setLoading(true);
 
       const formData = new FormData();
+
       if (multiple) {
         files.forEach((file) => formData.append(formKey, file));
       } else {
         formData.append(formKey, files[0]);
       }
 
-// Special flow for Redact PDF
-if (serviceKey === "redactPdf") {
-  navigate("/redact", {
-    state: {
-      file: files[0],
-    },
-  });
-  return;
-}
-      // Special flow for Rearrange PDF
-if (serviceKey === "rearrangePdf") {
-  const previewFormData = new FormData();
-  previewFormData.append("pdf", files[0]); // must match multer field name
+      // Redact flow
+      if (serviceKey === "redactPdf") {
+        navigate("/redact", {
+          state: { file: files[0] },
+        });
+        return;
+      }
 
-  const response = await fetch(
-    "http://localhost:8000/api/arrange/preview",
-    {
-      method: "POST",
-      body: previewFormData,
-    }
-  );
+      // Rearrange preview flow
+      if (serviceKey === "rearrangePdf") {
+        const previewFormData = new FormData();
+        previewFormData.append("pdf", files[0]);
 
-  if (!response.ok) throw new Error("Preview generation failed");
+        const response = await api.post(
+          "/api/arrange/preview",
+          previewFormData
+        );
 
-  const data = await response.json();
+        const data = response.data;
 
-  navigate("/rearrange", {
-    state: {
-      previews: data.previews,
-      totalPages: data.totalPages,
-      originalFile: files[0], // needed later for final rearrange
-    },
-  });
+        navigate("/rearrange", {
+          state: {
+            previews: data.previews,
+            totalPages: data.totalPages,
+            originalFile: files[0],
+          },
+        });
 
-  return;
-}
+        return;
+      }
 
-      // Normal flow for other services
-      const response = await fetch(`http://localhost:8000${apiEndpoint}`, {
-        method: "POST",
-        body: formData,
+      // Normal upload flow
+      const response = await api.post(apiEndpoint, formData, {
+        responseType: "blob",
       });
 
-      if (!response.ok) throw new Error("Upload failed");
-
-      const blob = await response.blob();
+      const blob = response.data;
       const outputURL = window.URL.createObjectURL(blob);
 
       const inputURL = multiple
@@ -114,7 +107,9 @@ if (serviceKey === "rearrangePdf") {
                   : "Change File"
                 : "Click to upload"}
             </span>
-            <span className="text-xs text-gray-400">{accept || "Supported format"}</span>
+            <span className="text-xs text-gray-400">
+              {accept || "Supported format"}
+            </span>
           </div>
 
           <input
@@ -129,9 +124,14 @@ if (serviceKey === "rearrangePdf") {
         {files.length > 0 && (
           <div className="mt-6 flex flex-col items-center gap-2 bg-gray-100 rounded-lg p-3">
             {files.map((file, index) => (
-              <div key={index} className="flex items-center justify-center gap-3 w-full">
+              <div
+                key={index}
+                className="flex items-center justify-center gap-3 w-full"
+              >
                 <FaFileAlt className="text-[#832126]" />
-                <span className="text-sm text-gray-700 truncate max-w-xs">{file.name}</span>
+                <span className="text-sm text-gray-700 truncate max-w-xs">
+                  {file.name}
+                </span>
               </div>
             ))}
           </div>
@@ -140,12 +140,11 @@ if (serviceKey === "rearrangePdf") {
         <button
           onClick={handleUpload}
           disabled={!files.length || loading}
-          className={`mt-8 w-full py-3 rounded-xl font-medium transition
-            ${
-              files.length
-                ? "bg-[#832126] hover:bg-[#d23837] text-white"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
+          className={`mt-8 w-full py-3 rounded-xl font-medium transition ${
+            files.length
+              ? "bg-[#832126] hover:bg-[#d23837] text-white"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          }`}
         >
           {loading ? "Uploading..." : "Continue"}
         </button>
