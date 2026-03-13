@@ -31,7 +31,7 @@ export default function SecurityUpload() {
       formData.append("password", password);
 
       // Use Axios instance
-      const response = await api.post(`/file/${type}`, formData, {
+      const response = await api.post(`/api/file/${type}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
