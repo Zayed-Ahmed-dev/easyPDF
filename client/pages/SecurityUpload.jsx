@@ -17,12 +17,6 @@ export default function SecurityUpload() {
       return;
     }
 
-    // Optional: only allow PDFs for security
-    if (file.type !== "application/pdf") {
-      alert("Only PDF files are allowed");
-      return;
-    }
-
     try {
       setLoading(true);
 
