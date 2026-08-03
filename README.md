@@ -11,7 +11,7 @@ A simple and fast web application for handling common PDF tasks in one place. Ea
 <!-- Add your homepage screenshot below -->
 
 <p align="center">
-  <img src="YOUR_SCREENSHOT.png" alt="EasyPDF Homepage" width="900">
+  <img src="git.png" alt="EasyPDF Homepage" width="900">
 </p>
 
 ---
