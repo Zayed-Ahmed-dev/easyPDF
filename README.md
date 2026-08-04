@@ -48,7 +48,7 @@ Permanently hide sensitive information from PDF documents before sharing them.
 
 * **Frontend:** React.js
 * **Backend:** Node.js
-* **Styling:** CSS / Tailwind CSS *(Update if different)*
+* **Styling:** Tailwind CSS 
 * **PDF Processing:** PDF libraries and custom utilities
 
 ---
